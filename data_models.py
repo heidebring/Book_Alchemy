@@ -2,7 +2,7 @@ from datetime import date
 from typing import Optional
 
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, exists
 from sqlalchemy.orm import Mapped, mapped_column
 
 db = SQLAlchemy()
@@ -69,6 +69,7 @@ def get_all_books(search, sort_by, order):
         Book.title.label("title"),
         Author.name.label("author"),
         Book.isbn.label("isbn"),
+        Book.id.label("id"),
     ).join(Author, Book.author == Author.id)
 
     if search:
@@ -90,3 +91,14 @@ def get_all_books(search, sort_by, order):
     books = query.all()
 
     return books
+
+
+def delete_book_from_db(book_id):
+    book = Book.query.filter(Book.id == book_id).first()
+    if book:
+        db.session.delete(book)
+        db.session.query(Author).filter(
+            ~exists().where(Book.author == Author.id)
+        ).delete()
+        db.session.commit()
+    return book

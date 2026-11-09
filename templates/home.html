@@ -46,6 +46,8 @@
 
     </form>
 
+    <span class="success">{{success_message}}</span>
+
     <div class="book-list">
 
         {% for book in books %}
@@ -57,6 +59,10 @@
                     <div class="book-author">
                         {{ book.author }}
                     </div>
+
+                    <form method="POST" action="/book/{{book.id}}/delete">
+                        <input type="submit" value="Löschen" class="delete-button">
+                    </form>
                 </div>
 
                 <img

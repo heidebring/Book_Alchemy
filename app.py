@@ -1,15 +1,11 @@
-from datetime import date
+from flask import Flask, redirect, render_template, request
 
-from flask import Flask, render_template, request
-
-from flask_sqlalchemy import SQLAlchemy
 
 from data_models import (
     add_author_to_db,
     add_book_to_db,
     db,
-    Author,
-    Book,
+    delete_book_from_db,
     get_all_authors,
     get_all_books,
 )
@@ -26,6 +22,7 @@ app.config["TEMPLATE_FOLDER"] = os.path.join(
 )
 
 db.init_app(app)
+success_message = ""
 
 # only once needed
 # with app.app_context():
@@ -34,11 +31,22 @@ db.init_app(app)
 
 @app.route("/")
 def home():
+    global success_message
     search = request.args.get("search", "").strip()
     sort_by = request.args.get("sort", "title")
     order = request.args.get("order", "asc")
     books = get_all_books(search=search, sort_by=sort_by, order=order)
-    return render_template("home.html", books=books)
+    return render_template("home.html", books=books, success_message=success_message)
+
+
+@app.route("/book/<int:book_id>/delete", methods=["POST"])
+def delete_book(book_id):
+    global success_message
+    book = delete_book_from_db(book_id)
+    if book is None:
+        return "Book not found", 404
+    success_message = "Book successfully deleted"
+    return redirect("/")
 
 
 @app.route("/add_author", methods=["GET", "POST"])

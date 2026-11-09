@@ -9,25 +9,25 @@
   <body>
 
   <form action="/add_book" method="POST">
-  <label for="isbn">ISBN number:</label>
-  <input type="number" id="isbn" name="isbn" required min="0"><br><br>
+    <label for="isbn">ISBN number:</label>
+    <input type="number" id="isbn" name="isbn" required min="0"><br><br>
 
-  <label for="title">Title:</label>
-  <input type="text" id="title" name="title" required><br><br>
+    <label for="title">Title:</label>
+    <input type="text" id="title" name="title" required><br><br>
 
-  <label for="author">Author:</label>
-  <select id="author" name="author" required>
-    {% for author in authors %}
-        <option value="{{ author.id }}">
-            {{ author.name }}
-        </option>
-    {% endfor %}
-  </select><br><br>
+    <label for="author">Author:</label>
+    <select id="author" name="author" required>
+        {% for author in authors %}
+            <option value="{{ author.id }}">
+                {{ author.name }}
+            </option>
+        {% endfor %}
+    </select><br><br>
 
-  <label for="publication_year">Publication year</label>
-  <input type="number" id="publication_year" name="publication_year" required min="1000" max="2100">
+    <label for="publication_year">Publication year</label>
+    <input type="number" id="publication_year" name="publication_year" required min="1000" max="2100">
 
-  <input type="submit" value="Add Book">
+    <input type="submit" value="Add Book">
 
   </form>
   <br/>

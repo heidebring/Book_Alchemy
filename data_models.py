@@ -9,6 +9,8 @@ db = SQLAlchemy()
 
 
 class Author(db.Model):
+    """Represents an author with attributes id, name, birth_date and date_of_death"""
+
     __tablename__ = "authors"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
@@ -18,6 +20,8 @@ class Author(db.Model):
 
 
 class Book(db.Model):
+    """Represents a book with attributes id, isbn, title, author and publication_year"""
+
     __tablename__ = "books"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
@@ -28,6 +32,8 @@ class Book(db.Model):
 
 
 def add_author_to_db(author_name, birth_date, date_of_death):
+    """Adds an author with a given name, birth_date and date_of_death to the db"""
+
     birth_date = date.fromisoformat(birth_date)
     if not date_of_death:
         date_of_death = None
@@ -47,12 +53,16 @@ def add_author_to_db(author_name, birth_date, date_of_death):
 
 
 def get_all_authors():
+    """Returns all authors in an alphabetically order"""
+
     return Author.query.order_by(
         Author.name,
     ).all()
 
 
 def add_book_to_db(isbn, title, author, publication_year):
+    """Adds a book with a given isbn, title, author and publication year to the db"""
+
     try:
         book = Book(
             isbn=isbn, title=title, author=author, publication_year=publication_year
@@ -65,6 +75,11 @@ def add_book_to_db(isbn, title, author, publication_year):
 
 
 def get_all_books(search, sort_by, order):
+    """
+    Returns all books stored in the db.
+    The result can be filtered by the given search, sort_by and order parameters.
+    """
+
     query = db.session.query(
         Book.title.label("title"),
         Author.name.label("author"),
@@ -94,6 +109,11 @@ def get_all_books(search, sort_by, order):
 
 
 def delete_book_from_db(book_id):
+    """
+    Deletes a book from the db with a given id.
+    Afterwards all authors with no books are deleted.
+    """
+
     book = Book.query.filter(Book.id == book_id).first()
     if book:
         db.session.delete(book)

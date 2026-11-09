@@ -31,6 +31,8 @@ success_message = ""
 
 @app.route("/")
 def home():
+    """Route for the list of books where you can search and sort the displayed books"""
+
     global success_message
     search = request.args.get("search", "").strip()
     sort_by = request.args.get("sort", "title")
@@ -41,6 +43,8 @@ def home():
 
 @app.route("/book/<int:book_id>/delete", methods=["POST"])
 def delete_book(book_id):
+    """Route for deleting a book with a given id"""
+
     global success_message
     book = delete_book_from_db(book_id)
     if book is None:
@@ -51,6 +55,8 @@ def delete_book(book_id):
 
 @app.route("/add_author", methods=["GET", "POST"])
 def add_author():
+    """Route for adding an author to the application"""
+
     if request.method == "GET":
         return render_template("add_author.html")
 
@@ -71,6 +77,8 @@ def add_author():
 
 @app.route("/add_book", methods=["GET", "POST"])
 def add_book():
+    """Route for adding a book to the application"""
+
     authors = get_all_authors()
     if request.method == "GET":
         return render_template("add_book.html", authors=authors)

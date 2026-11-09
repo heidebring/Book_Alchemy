@@ -1,3 +1,5 @@
+from datetime import date
+
 from flask import Flask, render_template, request
 
 from flask_sqlalchemy import SQLAlchemy
@@ -9,6 +11,7 @@ from data_models import (
     Author,
     Book,
     get_all_authors,
+    get_all_books,
 )
 import os
 
@@ -25,8 +28,17 @@ app.config["TEMPLATE_FOLDER"] = os.path.join(
 db.init_app(app)
 
 # only once needed
-with app.app_context():
-    db.create_all()
+# with app.app_context():
+#     db.create_all()
+
+
+@app.route("/")
+def home():
+    search = request.args.get("search", "").strip()
+    sort_by = request.args.get("sort", "title")
+    order = request.args.get("order", "asc")
+    books = get_all_books(search=search, sort_by=sort_by, order=order)
+    return render_template("home.html", books=books)
 
 
 @app.route("/add_author", methods=["GET", "POST"])

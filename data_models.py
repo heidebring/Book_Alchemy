@@ -21,7 +21,7 @@ class Book(db.Model):
     __tablename__ = "books"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    isbn: Mapped[str]
+    isbn: Mapped[int]
     title: Mapped[str]
     author: Mapped[int] = mapped_column(ForeignKey("authors.id"), nullable=False)
     publication_year: Mapped[int]
@@ -62,3 +62,31 @@ def add_book_to_db(isbn, title, author, publication_year):
     except Exception as e:
         db.session.rollback()
         raise e
+
+
+def get_all_books(search, sort_by, order):
+    query = db.session.query(
+        Book.title.label("title"),
+        Author.name.label("author"),
+        Book.isbn.label("isbn"),
+    ).join(Author, Book.author == Author.id)
+
+    if search:
+        query = query.filter(
+            db.or_(Book.title.ilike(f"%{search}%"), Author.name.ilike(f"%{search}%"))
+        )
+
+    if sort_by == "author":
+        if order == "asc":
+            query = query.order_by(Author.name.asc())
+        else:
+            query = query.order_by(Author.name.desc())
+    else:
+        if order == "asc":
+            query = query.order_by(Book.title.asc())
+        else:
+            query = query.order_by(Book.title.desc())
+
+    books = query.all()
+
+    return books

@@ -1,4 +1,4 @@
-from flask import Flask, redirect, render_template, request
+from flask import Flask, flash, redirect, render_template, request
 
 
 from data_models import (
@@ -20,9 +20,9 @@ app.config["SQLALCHEMY_DATABASE_URI"] = (
 app.config["TEMPLATE_FOLDER"] = os.path.join(
     os.path.dirname(os.path.abspath(__file__)), "templates"
 )
+app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 
 db.init_app(app)
-success_message = ""
 
 # only once needed
 # with app.app_context():
@@ -33,23 +33,21 @@ success_message = ""
 def home():
     """Route for the list of books where you can search and sort the displayed books"""
 
-    global success_message
     search = request.args.get("search", "").strip()
     sort_by = request.args.get("sort", "title")
     order = request.args.get("order", "asc")
     books = get_all_books(search=search, sort_by=sort_by, order=order)
-    return render_template("home.html", books=books, success_message=success_message)
+    return render_template("home.html", books=books)
 
 
 @app.route("/book/<int:book_id>/delete", methods=["POST"])
 def delete_book(book_id):
     """Route for deleting a book with a given id"""
 
-    global success_message
     book = delete_book_from_db(book_id)
     if book is None:
         return "Book not found", 404
-    success_message = "Book successfully deleted"
+    flash("Book successfully deleted", "success")
     return redirect("/")
 
 
@@ -70,9 +68,8 @@ def add_author():
         app.logger.exception(f"ERROR adding author: {e}")
         return render_template("add_author.html")
 
-    return render_template(
-        "add_author.html", success_message=f"Author {author_name} added"
-    )
+    flash("Author added", "success")
+    return render_template("add_author.html")
 
 
 @app.route("/add_book", methods=["GET", "POST"])
@@ -94,9 +91,8 @@ def add_book():
         app.logger.exception(f"ERROR adding book: {e}")
         return render_template("add_book.html")
 
-    return render_template(
-        "add_book.html", authors=authors, success_message=f"Book {title} added"
-    )
+    flash("Book added", "success")
+    return render_template("add_book.html", authors=authors)
 
 
 if __name__ == "__main__":

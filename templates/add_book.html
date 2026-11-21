@@ -8,6 +8,16 @@
   </head>
   <body>
 
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert-{{ category }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+  {% endwith %}
+
   <form action="/add_book" method="POST">
     <label for="isbn">ISBN number:</label>
     <input type="number" id="isbn" name="isbn" required min="0"><br><br>
@@ -30,8 +40,5 @@
     <input type="submit" value="Add Book">
 
   </form>
-  <br/>
-  <span class="success">{{success_message}}</span>
-
   </body>
 </html>

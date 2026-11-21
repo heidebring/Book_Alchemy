@@ -4,7 +4,7 @@ This project lets you manage authors and books which are stored in the file libr
 
 ## Installation
 
-To install this project, simply clone the repository and install the dependencies in requirements.txt using `pip`
+To install this project, simply clone the repository and install the dependencies in requirements.txt using `pip`. Furthermore you must set a secret key called SECRET_KEY in your .env file.
 
 ## Usage
 

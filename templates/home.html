@@ -12,41 +12,49 @@
         <input
         type="text"
         name="search"
-        placeholder="Buchtitel oder Autor suchen..."
+        placeholder="Search after title or author..."
         value="{{ request.args.get('search', '') }}"
     >
 
-        <label for="sort">Sortieren nach:</label>
+        <label for="sort">Sorting:</label>
 
         <select name="sort" id="sort">
             <option value="title"
                 {% if request.args.get('sort', 'title') == 'title' %}selected{% endif %}>
-                Titel
+                Title
             </option>
 
             <option value="author"
                 {% if request.args.get('sort') == 'author' %}selected{% endif %}>
-                Autor
+                Author
             </option>
         </select>
 
         <select name="order" id="order">
             <option value="asc"
                 {% if request.args.get('order', 'asc') == 'asc' %}selected{% endif %}>
-                Aufsteigend (A-Z)
+                Ascending (A-Z)
             </option>
 
             <option value="desc"
                 {% if request.args.get('order') == 'desc' %}selected{% endif %}>
-                Absteigend (Z-A)
+                Descending (Z-A)
             </option>
         </select>
 
-        <input type="submit" value="Sortieren">
+        <input type="submit" value="Sort">
 
     </form>
 
-    <span class="success">{{success_message}}</span>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert-{{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
 
     <div class="book-list">
 

@@ -207,3 +207,32 @@ select:focus {
 .delete-button:hover {
     background: #3f4752 !important;
 }
+
+
+.alert-success {
+    margin: 20px 0;
+    padding: 14px 16px;
+
+    background: #f0fdf4;
+    color: #15803d;
+
+    border: 1px solid #bbf7d0;
+    border-radius: 8px;
+
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.alert-error {
+    margin: 20px 0;
+    padding: 14px 16px;
+
+    background: #fef2f2;
+    color: #b91c1c;
+
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+
+    font-size: 14px;
+    font-weight: bold;
+}

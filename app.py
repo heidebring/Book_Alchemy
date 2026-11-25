@@ -1,15 +1,22 @@
+from dotenv import load_dotenv
 from flask import Flask, flash, redirect, render_template, request
 
-
-from data_models import (
+from data.data_models import db
+from data.data_manager import (
     add_author_to_db,
     add_book_to_db,
-    db,
     delete_book_from_db,
     get_all_authors,
     get_all_books,
+    get_author_by_name,
+    get_book_by_isbn,
+    get_book_by_title_and_author,
 )
 import os
+
+from helper import validate_author_inputs, validate_book_inputs
+
+load_dotenv()
 
 app = Flask(__name__)
 
@@ -62,9 +69,21 @@ def add_author():
     birth_date = request.form.get("birth_date", "")
     date_of_death = request.form.get("date_of_death", "")
 
+    validation_errors = validate_author_inputs(author_name, birth_date, date_of_death)
+    if len(validation_errors) > 0:
+        for error in validation_errors:
+            flash(error, "error")
+        return render_template("add_author.html")
+
+    author = get_author_by_name(author_name)
+    if author:
+        flash("Author already exists", "error")
+        return render_template("add_author.html")
+
     try:
         add_author_to_db(author_name, birth_date, date_of_death)
     except Exception as e:
+        flash("Something went wrong adding the author", "error")
         app.logger.exception(f"ERROR adding author: {e}")
         return render_template("add_author.html")
 
@@ -85,11 +104,28 @@ def add_book():
     author = request.form.get("author", "")
     publication_year = request.form.get("publication_year", "")
 
+    validation_errors = validate_book_inputs(isbn, title, author, publication_year)
+    if len(validation_errors) > 0:
+        for error in validation_errors:
+            flash(error, "error")
+        return render_template("add_book.html", authors=authors)
+
+    book_with_isbn = get_book_by_isbn(isbn)
+    if book_with_isbn:
+        flash("A book with the given isbn already exists", "error")
+        return render_template("add_book.html", authors=authors)
+
+    book_with_title_by_author = get_book_by_title_and_author(title, author)
+    if book_with_title_by_author:
+        flash("A book with the given title already exists for this author", "error")
+        return render_template("add_book.html", authors=authors)
+
     try:
         add_book_to_db(isbn, title, author, publication_year)
     except Exception as e:
+        flash("Something went wrong adding the book", "error")
         app.logger.exception(f"ERROR adding book: {e}")
-        return render_template("add_book.html")
+        return render_template("add_book.html", authors=authors)
 
     flash("Book added", "success")
     return render_template("add_book.html", authors=authors)

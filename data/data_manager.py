@@ -1,34 +1,8 @@
 from datetime import date
-from typing import Optional
 
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import ForeignKey, exists
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import exists
 
-db = SQLAlchemy()
-
-
-class Author(db.Model):
-    """Represents an author with attributes id, name, birth_date and date_of_death"""
-
-    __tablename__ = "authors"
-
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    name: Mapped[str]
-    birth_date: Mapped[date]
-    date_of_death: Mapped[Optional[date]]
-
-
-class Book(db.Model):
-    """Represents a book with attributes id, isbn, title, author and publication_year"""
-
-    __tablename__ = "books"
-
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    isbn: Mapped[int]
-    title: Mapped[str]
-    author: Mapped[int] = mapped_column(ForeignKey("authors.id"), nullable=False)
-    publication_year: Mapped[int]
+from data.data_models import Author, Book, db
 
 
 def add_author_to_db(author_name, birth_date, date_of_death):
@@ -52,6 +26,13 @@ def add_author_to_db(author_name, birth_date, date_of_death):
         raise e
 
 
+def get_author_by_name(author_name):
+    """Returns the author with a given name"""
+
+    author = Author.query.filter(Author.name == author_name).first()
+    return author
+
+
 def get_all_authors():
     """Returns all authors in an alphabetically order"""
 
@@ -72,6 +53,22 @@ def add_book_to_db(isbn, title, author, publication_year):
     except Exception as e:
         db.session.rollback()
         raise e
+
+
+def get_book_by_isbn(isbn):
+    """Returns the book with a given isbn"""
+
+    book = Book.query.filter(Book.isbn == isbn).first()
+    return book
+
+
+def get_book_by_title_and_author(title, author):
+    """Returns the book with a given title for a given author"""
+
+    book = Book.query.filter(
+        db.and_(Book.title == title, Book.author == author)
+    ).first()
+    return book
 
 
 def get_all_books(search, sort_by, order):
